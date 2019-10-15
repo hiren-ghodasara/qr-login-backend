@@ -14,3 +14,8 @@
 Broadcast::channel('App.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
+
+Broadcast::channel('uniqueCode.{channelId}', function ($user, $toUserId) {
+    //return $user->id == $toUserId;
+    return true;
+});

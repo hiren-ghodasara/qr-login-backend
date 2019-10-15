@@ -107,6 +107,7 @@ class AuthController extends Controller
             $user = $request->user();
             $token = $this->getBearerTokenByUser($user, 3, false);
             $arr = ['code' => $code, 'token' => $token];
+
             event(new UniqueCodeDecode($arr));
 
             return response($arr);

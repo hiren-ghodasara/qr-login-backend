@@ -5,8 +5,9 @@ namespace App\Events\Api;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class UniqueCodeDecode
+class UniqueCodeDecode implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -28,5 +29,10 @@ class UniqueCodeDecode
     public function broadcastOn()
     {
         return ['uniqueCode.'.$this->uniqueCode['code']->channel_id];
+    }
+
+    public function broadcastAs()
+    {
+        return 'UniqueCodeDecode';
     }
 }
