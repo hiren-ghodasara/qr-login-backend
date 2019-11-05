@@ -37,7 +37,7 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        if (! auth()->attempt($loginData)) {
+        if (!auth()->attempt($loginData)) {
             return response(['message' => 'Invalid credentials']);
         }
         $accessToken = auth()->user()->createToken('authToken')->accessToken;
@@ -78,7 +78,7 @@ class AuthController extends Controller
         //var_dump($code);
         $data = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->margin(1)->size(400)->generate($code->unique_code));
 
-        return response(['qr_code' => $data, 'channel_id' => $code->channel_id], 200);
+        return response(['qr_code' => $data, 'channel_id' => $code->channel_id]);
         //<img src="data:image/png;base64, {!! base64_encode(QrCode::format('png')->size(100)->generate('Make me into an QrCode!')) !!} ">
     }
 
@@ -103,7 +103,7 @@ class AuthController extends Controller
         $code = UniqueCode::where('unique_code', '=', $validatedData['text'])->first();
 
         if ($code) {
-            //$code = UniqueCode::orderBy('created_at', 'desc')->first();
+            $code = UniqueCode::orderBy('created_at', 'desc')->first();
             $user = $request->user();
             $token = $this->getBearerTokenByUser($user, 3, false);
             $arr = ['code' => $code, 'token' => $token];

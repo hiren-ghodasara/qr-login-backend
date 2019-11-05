@@ -33,5 +33,8 @@ class AuthServiceProvider extends ServiceProvider
             return $user->hasRole(config('access.users.admin_role')) ? true : null;
         });
         Passport::routes();
+        Passport::personalAccessTokensExpireIn(now()->addSeconds(15000));
+        Passport::tokensExpireIn(now()->addSeconds(15000));
+        Passport::refreshTokensExpireIn(now()->addSeconds(36000));
     }
 }
