@@ -91,7 +91,7 @@ class AuthController extends Controller
             $randomString .= $characters[rand(0, $charactersLength - 1)];
         }
 
-        return $randomString.'&&'.uniqid(rand());
+        return $randomString . '&&' . uniqid(rand());
     }
 
     public function decodeQrCode(Request $request)
@@ -103,7 +103,7 @@ class AuthController extends Controller
         $code = UniqueCode::where('unique_code', '=', $validatedData['text'])->first();
 
         if ($code) {
-            $code = UniqueCode::orderBy('created_at', 'desc')->first();
+            //$code = UniqueCode::orderBy('created_at', 'desc')->first();
             $user = $request->user();
             $token = $this->getBearerTokenByUser($user, 3, false);
             $arr = ['code' => $code, 'token' => $token];

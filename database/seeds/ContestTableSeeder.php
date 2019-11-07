@@ -17,12 +17,12 @@ class ContestTableSeeder extends Seeder
         $startDate = "now";
         $endDate = "+1 months";
 
-        for ($i = 1; $i <= 70; $i++) {
+        for ($i = 1; $i <= 100; $i++) {
             $sourceDir = storage_path('app/public/contest_default');
             $targetDir = storage_path('app/public/contest_photo');
             $path = $faker->file($sourceDir, $targetDir, false);
             $startDate = \Carbon\Carbon::now();
-            $endDate = $startDate->addMinute(rand(1, 100));
+            $endDate = $startDate->addMinute(rand(1, 1000));
             DB::table('contests')->insert([
                 'name' => $faker->safeColorName,
                 'photo' => "storage/contest_photo/{$path}",
