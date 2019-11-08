@@ -14,7 +14,7 @@ class ContestController extends Controller
     public function listAllContest(Request $request)
     {
         //sleep(3);
-        //dd(Carbon::now());
+        //print_r($request->get('sort'));
         DB::enableQueryLog();
         $query = Contest::with(['contestsType', 'user']);
         if ($request->get('price')) {
@@ -27,7 +27,14 @@ class ContestController extends Controller
             $query->whereIn('created_by', $request->get('organizer'));
         }
         $query = $query->where('execution_date', '>', Carbon::now());
-        $query = $query->orderBy('execution_date');
+        if ($request->get('sort')) {
+            $sortCol = $request->get('sort')['key'];
+            if ($sortCol == "joined_user") {
+                $sortCol = DB::raw("joined_user * 100 / max_user");
+            }
+            $query = $query->orderBy($sortCol, $request->get('sort')['by']);
+        }
+
         $data = $query->paginate($request->get('per_page'));
         //lq(1);
         return response($data);
