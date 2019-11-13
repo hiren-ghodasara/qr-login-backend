@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Repositories\Frontend\Auth\UserRepository;
 use Lcobucci\JWT\Parser;
 use App\Models\Auth\User;
 use App\Models\UniqueCode;
@@ -14,20 +15,19 @@ class AuthController extends Controller
 {
     use PassportToken;
 
-    public function register(Request $request)
+    public function register(Request $request,UserRepository $userRepository)
     {
         //sleep(1);
-        $validatedData = $request->validate([
-            'name' => 'required|max:55',
+        $request->validate([
+            'first_name' => 'required|max:55|min:10',
+            'last_name' => 'required|max:55',
             'email' => 'email|required|unique:users',
-            'password' => 'required|confirmed',
+            'password' => 'required|confirmed|min:10|alpha_num|ip',
         ]);
         //return $validator->errors()->all()->toJson();
-        $validatedData['password'] = bcrypt($request->password);
-        $user = User::create($validatedData);
-        $accessToken = $user->createToken('authToken')->accessToken;
-
-        return response()->json(['user' => $user, 'access_token' => $accessToken]);
+        $user = $user = $userRepository->create($request->only('first_name', 'last_name', 'email', 'password'));
+        $token = $this->getBearerTokenByUser($user, 3, false);
+        return response()->json($token);
     }
 
     public function login(Request $request)
@@ -38,11 +38,19 @@ class AuthController extends Controller
         ]);
 
         if (!auth()->attempt($loginData)) {
-            return response(['message' => 'Invalid credentials']);
+            return response(['message' => 'Invalid credentials'], 422);
         }
-        $accessToken = auth()->user()->createToken('authToken')->accessToken;
+        //$accessToken = auth()->user()->createToken('authToken')->toArray();
+        //dd($accessToken->);
+        //return response(['user' => auth()->user(), 'access_token' => $accessToken, 'token_type' => 'Bearer']);
 
-        return response(['user' => auth()->user(), 'access_token' => $accessToken, 'token_type' => 'Bearer']);
+        //$objToken = auth()->user()->createToken('authToken');
+        //$strToken = $objToken->accessToken;
+        //$expiration = $objToken->token->expires_at->diffInSeconds(Carbon::now());
+
+        $token = $this->getBearerTokenByUser(auth()->user(), 3, false);
+        return response()->json($token);
+
     }
 
     public function logout(Request $request)
@@ -103,7 +111,7 @@ class AuthController extends Controller
         $code = UniqueCode::where('unique_code', '=', $validatedData['text'])->first();
 
         if ($code) {
-            //$code = UniqueCode::orderBy('created_at', 'desc')->first();
+            $code = UniqueCode::orderBy('created_at', 'desc')->first();
             $user = $request->user();
             $token = $this->getBearerTokenByUser($user, 3, false);
             $arr = ['code' => $code, 'token' => $token];

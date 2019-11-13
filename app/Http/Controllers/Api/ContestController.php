@@ -55,7 +55,7 @@ class ContestController extends Controller
         }
         $user = Contest::select('created_by', DB::raw('1 as visibility'), DB::raw('count(*) as total'))->with(['user' => function ($query) {
             $query->select('id', 'first_name', 'last_name');
-        }])->groupBy('created_by')->get();
+        }])->where('execution_date', '>', Carbon::now())->groupBy('created_by')->get();
         if ($user) {
             $filterResult['organizer'] = $user;
         }
@@ -64,7 +64,6 @@ class ContestController extends Controller
 
     public function TestCreate(Request $request)
     {
-        //die();
         $faker = \Faker\Factory::create();
         $sourceDir = storage_path('app/public/contest_default');
         $targetDir = storage_path('app/public/contest_photo');
@@ -74,7 +73,7 @@ class ContestController extends Controller
                 'name' => $faker->safeColorName,
                 'photo' => "storage/contest_photo/{$path}",
                 'description' => $faker->paragraph(rand(3, 30)),
-                'created_by' => 3,
+                'created_by' => \Auth::guard('api')->check() ? \Auth::guard('api')->user()->id : 3,
                 'type' => 1,
                 'joining_fee' => $faker->numberBetween(10, 100),
                 'max_user' => $faker->numberBetween(40, 50),
