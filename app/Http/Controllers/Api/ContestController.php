@@ -47,7 +47,7 @@ class ContestController extends Controller
         $query->select(DB::raw("MAX(joining_fee) as maxPrice , MIN(joining_fee) as minPrice"));
         $result = $query->get();
         if ($result && $result[0]) {
-            $filterResult['price'] = ["min" => $result[0]->minPrice, "max" => $result[0]->maxPrice];
+            $filterResult['price'] = ["min" => (float)$result[0]->minPrice, "max" => (float)$result[0]->maxPrice];
         }
         $contests_type = ContestType::all();
         if ($contests_type) {

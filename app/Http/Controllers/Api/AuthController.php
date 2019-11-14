@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Repositories\Frontend\Auth\UserRepository;
+use Laravel\Passport\Passport;
 use Lcobucci\JWT\Parser;
 use App\Models\Auth\User;
 use App\Models\UniqueCode;
@@ -15,7 +16,7 @@ class AuthController extends Controller
 {
     use PassportToken;
 
-    public function register(Request $request,UserRepository $userRepository)
+    public function register(Request $request, UserRepository $userRepository)
     {
         //sleep(1);
         $request->validate([
@@ -71,6 +72,27 @@ class AuthController extends Controller
         $data = User::all();
 
         return response($data);
+    }
+
+    public function userAllApiTokens(Request $request)
+    {
+        $data = Passport::token()->where('user_id', $request->user()->id)->where('revoked', false)->get();
+        return response($data);
+    }
+
+    public function revokeApiTokens(Request $request)
+    {
+        $request->validate([
+            'id' => 'required'
+        ]);
+        $token = Passport::token()->where('id', $request->get('id'))->where('user_id', $request->user()->id)->first();
+        if (is_null($token)) {
+            return response('', 404);
+        }
+        $token->revoke();
+        return response()->json([
+            'message' => 'Successfully logged out',
+        ]);
     }
 
     public function getQrCode(Request $request)

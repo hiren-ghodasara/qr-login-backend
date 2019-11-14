@@ -21,7 +21,23 @@
             <example-component></example-component>
         </div><!--col-->
     </div><!--row-->
-
+    @auth
+    <div class="row mb-4">
+        <div class="col">
+            <passport-clients></passport-clients>
+        </div><!--col-->
+    </div><!--row-->
+    <div class="row mb-4">
+        <div class="col">
+            <passport-authorized-clients></passport-authorized-clients>
+        </div><!--col-->
+    </div><!--row-->
+    <div class="row mb-4">
+        <div class="col">
+            <passport-personal-access-tokens></passport-personal-access-tokens>
+        </div><!--col-->
+    </div><!--row-->
+    @endauth
     <div class="row">
         <div class="col">
             <div class="card">
