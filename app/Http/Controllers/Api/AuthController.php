@@ -19,10 +19,10 @@ class AuthController extends Controller
     {
         //sleep(1);
         $request->validate([
-            'first_name' => 'required|max:55|min:10',
+            'first_name' => 'required|max:55',
             'last_name' => 'required|max:55',
             'email' => 'email|required|unique:users',
-            'password' => 'required|confirmed|min:10|alpha_num|ip',
+            'password' => 'required|confirmed|min:6',
         ]);
         //return $validator->errors()->all()->toJson();
         $user = $user = $userRepository->create($request->only('first_name', 'last_name', 'email', 'password'));
