@@ -1,8 +1,8 @@
 <?php
 
+use Faker\Generator as Faker;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Faker\Generator as Faker;
 
 class ContestTableSeeder extends Seeder
 {
@@ -13,9 +13,8 @@ class ContestTableSeeder extends Seeder
      */
     public function run(Faker $faker)
     {
-
-        $startDate = "now";
-        $endDate = "+1 months";
+        $startDate = 'now';
+        $endDate = '+1 months';
 
         for ($i = 1; $i <= 100; $i++) {
             $sourceDir = storage_path('app/public/contest_default');
@@ -34,7 +33,7 @@ class ContestTableSeeder extends Seeder
                 'joined_user' => $faker->numberBetween(1, 40),
                 'execution_date' => $endDate,
                 'created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now()
+                'updated_at' => \Carbon\Carbon::now(),
             ]);
         }
     }

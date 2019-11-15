@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Repositories\Frontend\Auth\UserRepository;
-use Laravel\Passport\Passport;
 use Lcobucci\JWT\Parser;
 use App\Models\Auth\User;
 use App\Models\UniqueCode;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Traits\PassportToken;
+use Laravel\Passport\Passport;
 use App\Events\Api\UniqueCodeDecode;
 use App\Http\Controllers\Controller;
+use App\Repositories\Frontend\Auth\UserRepository;
 
 class AuthController extends Controller
 {
@@ -28,6 +29,7 @@ class AuthController extends Controller
         //return $validator->errors()->all()->toJson();
         $user = $user = $userRepository->create($request->only('first_name', 'last_name', 'email', 'password'));
         $token = $this->getBearerTokenByUser($user, 3, false);
+
         return response()->json($token);
     }
 
@@ -50,8 +52,8 @@ class AuthController extends Controller
         //$expiration = $objToken->token->expires_at->diffInSeconds(Carbon::now());
 
         $token = $this->getBearerTokenByUser(auth()->user(), 3, false);
-        return response()->json($token);
 
+        return response()->json($token);
     }
 
     public function logout(Request $request)
@@ -84,20 +86,23 @@ class AuthController extends Controller
             ['revoked', '=', false],
             ['id', '!=', $id],
         ])->get();
+
         return response($data);
     }
 
     public function revokeApiTokens(Request $request)
     {
         $request->validate([
-            'id' => 'required'
+            'id' => 'required',
         ]);
 
         $token = Passport::token()->where('id', $request->get('id'))->where('user_id', $request->user()->id)->first();
+
         if (is_null($token)) {
             return response('', 404);
         }
         $token->revoke();
+
         return response()->json([
             'message' => 'Successfully logged out',
         ]);
@@ -144,13 +149,20 @@ class AuthController extends Controller
             $code = UniqueCode::orderBy('created_at', 'desc')->first();
             $user = $request->user();
             $token = $this->getBearerTokenByUser($user, 3, false);
-            $arr = ['code' => $code, 'token' => $token];
-
+            $arr = ['code' => $code,
+                    'token' => $token,];
             event(new UniqueCodeDecode($arr));
 
             return response($arr);
         }
 
         return response(['message' => 'Invalid credentials']);
+    }
+
+    public function userAllTransactions(Request $request)
+    {
+        $data = Transaction::where('user_id', $request->user()->id)->get();
+
+        return response($data);
     }
 }

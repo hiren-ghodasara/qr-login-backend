@@ -6,9 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Transaction extends Model
 {
-
     protected $fillable = [
-        'amount', 'meta', 'type', 'description'
+        'amount', 'meta', 'type', 'description',
     ];
 
     public function user()

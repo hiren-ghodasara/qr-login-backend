@@ -25,8 +25,12 @@ Route::middleware('auth:api')->group(function () {
         return $request->user();
     });
     Route::get('/user-list', 'Api\AuthController@userList')->name('user.list');
-    Route::get('/user-tokens', 'Api\AuthController@userAllApiTokens')->name('user.tokens');
-    Route::get('/revoke-tokens', 'Api\AuthController@revokeApiTokens')->name('user.tokens.revoke');
+    //auth
     Route::post('/decode-qr', 'Api\AuthController@decodeQrCode')->name('user.decode.qr');
     Route::get('/logout', 'Api\AuthController@logout')->name('logout');
+    //api token
+    Route::get('/user-tokens', 'Api\AuthController@userAllApiTokens')->name('user.tokens');
+    Route::get('/revoke-tokens', 'Api\AuthController@revokeApiTokens')->name('user.tokens.revoke');
+    //transaction
+    Route::get('/user-transactions', 'Api\AuthController@userAllTransactions')->name('user.transactions');
 });

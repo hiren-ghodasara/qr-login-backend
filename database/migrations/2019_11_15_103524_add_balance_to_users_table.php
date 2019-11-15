@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class AddBalanceToUsersTable extends Migration
 {
@@ -14,7 +14,7 @@ class AddBalanceToUsersTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->double('balance',10, 2)->default(0)->after('email');
+            $table->double('balance', 10, 2)->default(0)->after('email');
         });
     }
 

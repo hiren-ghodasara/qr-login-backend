@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use App\Models\Contest;
 use App\Models\ContestType;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 
 class ContestController extends Controller
 {
@@ -17,20 +17,25 @@ class ContestController extends Controller
         //print_r($request->get('sort'));
         DB::enableQueryLog();
         $query = Contest::with(['contestsType', 'user']);
+
         if ($request->get('price')) {
             $query->whereBetween('joining_fee', $request->get('price'));
         }
+
         if ($request->get('contests_type')) {
             $query->whereIn('type', $request->get('contests_type'));
         }
+
         if ($request->get('organizer')) {
             $query->whereIn('created_by', $request->get('organizer'));
         }
         $query = $query->where('execution_date', '>', Carbon::now());
+
         if ($request->get('sort')) {
             $sortCol = $request->get('sort')['key'];
-            if ($sortCol == "joined_user") {
-                $sortCol = DB::raw("joined_user * 100 / max_user");
+
+            if ($sortCol == 'joined_user') {
+                $sortCol = DB::raw('joined_user * 100 / max_user');
             }
             $query = $query->orderBy($sortCol, $request->get('sort')['by']);
         }
@@ -42,23 +47,27 @@ class ContestController extends Controller
 
     public function setSideBarFilter(Request $request)
     {
-        $filterResult = array();
+        $filterResult = [];
         $query = DB::table('contests');
-        $query->select(DB::raw("MAX(joining_fee) as maxPrice , MIN(joining_fee) as minPrice"));
+        $query->select(DB::raw('MAX(joining_fee) as maxPrice , MIN(joining_fee) as minPrice'));
         $result = $query->get();
+
         if ($result && $result[0]) {
-            $filterResult['price'] = ["min" => (float)$result[0]->minPrice, "max" => (float)$result[0]->maxPrice];
+            $filterResult['price'] = ['min' => (float) $result[0]->minPrice, 'max' => (float) $result[0]->maxPrice];
         }
         $contests_type = ContestType::all();
+
         if ($contests_type) {
             $filterResult['contests_type'] = $contests_type;
         }
         $user = Contest::select('created_by', DB::raw('1 as visibility'), DB::raw('count(*) as total'))->with(['user' => function ($query) {
             $query->select('id', 'first_name', 'last_name');
         }])->where('execution_date', '>', Carbon::now())->groupBy('created_by')->get();
+
         if ($user) {
             $filterResult['organizer'] = $user;
         }
+
         return response($filterResult);
     }
 
@@ -81,6 +90,7 @@ class ContestController extends Controller
                 'execution_date' => Carbon::parse($request->get('execution_date'))->addMinute(10),
             ]
         );
+
         return response($filterResult);
     }
 }

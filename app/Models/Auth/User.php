@@ -28,9 +28,9 @@ class User extends BaseUser
             $this->transactions()
                 ->create([
                     'amount' => $amount,
-                    'type' => "deposit",
+                    'type' => 'deposit',
                     'description' => $description,
-                    'meta' => $meta
+                    'meta' => $meta,
                 ]);
             $this->balance += $amount;
             $this->save();
@@ -43,9 +43,9 @@ class User extends BaseUser
             $this->transactions()
                 ->create([
                     'amount' => $amount,
-                    'type' => "withdraw",
+                    'type' => 'withdraw',
                     'description' => $description,
-                    'meta' => $meta
+                    'meta' => $meta,
                 ]);
             $this->balance -= $amount;
             $this->save();
