@@ -76,7 +76,14 @@ class AuthController extends Controller
 
     public function userAllApiTokens(Request $request)
     {
-        $data = Passport::token()->where('user_id', $request->user()->id)->where('revoked', false)->get();
+        $value = $request->bearerToken();
+        $id = (new Parser())->parse($value)->getHeader('jti');
+        //$data = Passport::token()->where('user_id', $request->user()->id)->where('revoked', false)->whereNotIn('id', [$id])->get();
+        $data = Passport::token()->where([
+            ['user_id', '=', $request->user()->id],
+            ['revoked', '=', false],
+            ['id', '!=', $id],
+        ])->get();
         return response($data);
     }
 
@@ -85,6 +92,7 @@ class AuthController extends Controller
         $request->validate([
             'id' => 'required'
         ]);
+
         $token = Passport::token()->where('id', $request->get('id'))->where('user_id', $request->user()->id)->first();
         if (is_null($token)) {
             return response('', 404);
@@ -129,7 +137,7 @@ class AuthController extends Controller
         $validatedData = $request->validate([
             'text' => 'required',
         ]);
-
+        dd($request->bearerToken());
         $code = UniqueCode::where('unique_code', '=', $validatedData['text'])->first();
 
         if ($code) {

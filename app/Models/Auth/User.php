@@ -16,4 +16,39 @@ class User extends BaseUser
         UserMethod,
         UserRelationship,
         UserScope;
+
+    public function transactions()
+    {
+        return $this->hasMany("App\Models\Transaction");
+    }
+
+    public function deposit($amount, $description = null, $meta = null)
+    {
+        return \DB::transaction(function () use ($amount, $description, $meta) {
+            $this->transactions()
+                ->create([
+                    'amount' => $amount,
+                    'type' => "deposit",
+                    'description' => $description,
+                    'meta' => $meta
+                ]);
+            $this->balance += $amount;
+            $this->save();
+        });
+    }
+
+    public function withdraw($amount, $description = null, $meta = null)
+    {
+        return \DB::transaction(function () use ($amount, $description, $meta) {
+            $this->transactions()
+                ->create([
+                    'amount' => $amount,
+                    'type' => "withdraw",
+                    'description' => $description,
+                    'meta' => $meta
+                ]);
+            $this->balance -= $amount;
+            $this->save();
+        });
+    }
 }
