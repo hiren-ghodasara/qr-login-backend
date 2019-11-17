@@ -167,12 +167,19 @@ class AuthController extends Controller
 
     public function userAllPaymentMethods(Request $request)
     {
+        $authUser = $request->user();
+        //$authUser = User::find(5);
+
         \Stripe\Stripe::setApiKey('sk_test_uXTV9GT6UGh0drRexd8SX63k00bz9te0rZ');
         $paymentMethod = \Stripe\PaymentMethod::all([
-            'customer' => $request->user()->stripe_id,
+            'customer' => $authUser->stripe_id,
             'type' => 'card',
         ]);
-        //$paymentMethod  = $request->user()->paymentMethods();
+
+//        $paymentMethod  = $authUser->paymentMethods();
+//        foreach($paymentMethod as $pm){
+//            dd($pm->asStripePaymentMethod()->toArray());
+//        }
         return response($paymentMethod);
     }
 
@@ -208,13 +215,13 @@ class AuthController extends Controller
             $user = User::find(5);
             //$user = $request->user();
 
-            $customer = $user->createOrGetStripeCustomer();
-            $payment = $user->charge(100,'pm_1FfgJ7JrUCJ0Ln0ZJG0fkVlW');
-            $user->deposit(100, 'add money');
+            //$customer = $user->createOrGetStripeCustomer();
+            $payment = $user->charge(100, 'pm_1FfgJ7JrUCJ0Ln0ZJG0fkVlW');
+            $user->deposit(100, 'add money', $payment->asStripePaymentIntent()->toJSON());
             return response([
                 'message' => 'Money Added Successfully',
-                'payment' => $payment->charges,
-                'customer' => $customer,
+                'payment' => $payment->asStripePaymentIntent()->toJSON(),
+                //'customer' => $customer,
             ]);
         } catch (\Exception $ex) {
             throw $ex;
