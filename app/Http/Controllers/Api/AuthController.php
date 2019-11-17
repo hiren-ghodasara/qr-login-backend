@@ -28,7 +28,7 @@ class AuthController extends Controller
         ]);
         //return $validator->errors()->all()->toJson();
         $user = $user = $userRepository->create($request->only('first_name', 'last_name', 'email', 'password'));
-        $token = $this->getBearerTokenByUser($user, 3, false);
+        $token = $this->getBearerTokenByUser($user, 2, false);
 
         return response()->json($token);
     }
@@ -51,7 +51,7 @@ class AuthController extends Controller
         //$strToken = $objToken->accessToken;
         //$expiration = $objToken->token->expires_at->diffInSeconds(Carbon::now());
 
-        $token = $this->getBearerTokenByUser(auth()->user(), 3, false);
+        $token = $this->getBearerTokenByUser(auth()->user(), 2, false);
 
         return response()->json($token);
     }
@@ -142,11 +142,10 @@ class AuthController extends Controller
         $validatedData = $request->validate([
             'text' => 'required',
         ]);
-        dd($request->bearerToken());
         $code = UniqueCode::where('unique_code', '=', $validatedData['text'])->first();
 
         if ($code) {
-            $code = UniqueCode::orderBy('created_at', 'desc')->first();
+            //$code = UniqueCode::orderBy('created_at', 'desc')->first();
             $user = $request->user();
             $token = $this->getBearerTokenByUser($user, 3, false);
             $arr = ['code' => $code,
@@ -164,5 +163,61 @@ class AuthController extends Controller
         $data = Transaction::where('user_id', $request->user()->id)->get();
 
         return response($data);
+    }
+
+    public function userAllPaymentMethods(Request $request)
+    {
+        \Stripe\Stripe::setApiKey('sk_test_uXTV9GT6UGh0drRexd8SX63k00bz9te0rZ');
+        $paymentMethod = \Stripe\PaymentMethod::all([
+            'customer' => $request->user()->stripe_id,
+            'type' => 'card',
+        ]);
+        //$paymentMethod  = $request->user()->paymentMethods();
+        return response($paymentMethod);
+    }
+
+    public function userCreatePaymentMethodIntent(Request $request)
+    {
+        $data = $request->user()->createSetupIntent();
+        return response($data);
+    }
+
+    public function addPaymentMethod(Request $request)
+    {
+        $request->validate([
+            'setupIntent.payment_method' => 'required',
+        ]);
+        try {
+            $paymentMethod = $request->get('setupIntent')['payment_method'];
+            $request->user()->addPaymentMethod($paymentMethod);
+            //$data  = $request->user()->paymentMethods();
+            return response([
+                'message' => 'Card Added Successfully',
+            ]);
+        } catch (\Exception $ex) {
+            throw $ex;
+            return response()->json([
+                "message" => $ex->getMessage(),
+            ], 422);
+        }
+    }
+
+    public function addMoneyWallet(Request $request)
+    {
+        try {
+            $user = User::find(5);
+            //$user = $request->user();
+
+            $customer = $user->createOrGetStripeCustomer();
+            $payment = $user->charge(100,'pm_1FfgJ7JrUCJ0Ln0ZJG0fkVlW');
+            $user->deposit(100, 'add money');
+            return response([
+                'message' => 'Money Added Successfully',
+                'payment' => $payment->charges,
+                'customer' => $customer,
+            ]);
+        } catch (\Exception $ex) {
+            throw $ex;
+        }
     }
 }

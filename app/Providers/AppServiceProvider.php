@@ -50,7 +50,7 @@ class AppServiceProvider extends ServiceProvider
          * Set the session variable for whether or not the app is using RTL support
          * For use in the blade directive in BladeServiceProvider
          */
-        if (! app()->runningInConsole()) {
+        if (!app()->runningInConsole()) {
             if (config('locale.languages')[config('app.locale')][2]) {
                 session(['lang-rtl' => true]);
             } else {
@@ -73,17 +73,20 @@ class AppServiceProvider extends ServiceProvider
          * The block of code inside this directive indicates
          * the project is currently running in read only mode.
          */
-        Blade::if('readonly', function () {
-            return config('app.read_only');
-        });
+        Blade::
+        if ('readonly', function ()
+    {
+        return config('app.read_only');
+    });
 
         /*
          * The block of code inside this directive indicates
          * the chosen language requests RTL support.
          */
-        Blade::if('langrtl', function ($session_identifier = 'lang-rtl') {
-            return session()->has($session_identifier);
-        });
+        Blade::if ('langrtl', function ($session_identifier = 'lang-rtl')
+    {
+        return session()->has($session_identifier);
+    });
 
         Schema::defaultStringLength(191);
     }

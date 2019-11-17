@@ -21,6 +21,7 @@
         "fzaninotto/faker": "^1.8",
         "lab404/laravel-impersonate": "^1.4",
         "langleyfoxall/laravel-nist-password-rules": "^4.0",
+        "laravel/cashier": "^10.5",
         "laravel/framework": "^6.0",
         "laravel/passport": "^7.5",
         "laravel/socialite": "^4.1",
