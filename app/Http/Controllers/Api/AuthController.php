@@ -170,17 +170,33 @@ class AuthController extends Controller
         $authUser = $request->user();
         //$authUser = User::find(5);
 
-        \Stripe\Stripe::setApiKey('sk_test_uXTV9GT6UGh0drRexd8SX63k00bz9te0rZ');
-        $paymentMethod = \Stripe\PaymentMethod::all([
-            'customer' => $authUser->stripe_id,
-            'type' => 'card',
-        ]);
+//        \Stripe\Stripe::setApiKey('sk_test_uXTV9GT6UGh0drRexd8SX63k00bz9te0rZ');
+//        $paymentMethod = \Stripe\PaymentMethod::all([
+//            'customer' => $authUser->stripe_id,
+//            'type' => 'card',
+//        ]);
 
-//        $paymentMethod  = $authUser->paymentMethods();
-//        foreach($paymentMethod as $pm){
-//            dd($pm->asStripePaymentMethod()->toArray());
-//        }
-        return response($paymentMethod);
+        $defaultPaymentMethod = $authUser->defaultPaymentMethod();
+        //dump($defaultPaymentMethod->id);
+        $paymentMethod = $authUser->paymentMethods();
+        $returnArr = [];
+        foreach ($paymentMethod as $key => $pm) {
+            //dump($pm->id);
+            if ($defaultPaymentMethod->id == $pm->id) {
+                $returnArr[$key] = $pm->asStripePaymentMethod()->toArray();
+                $returnArr[$key]['default'] = true;
+            } else {
+                $returnArr[$key] = $pm->asStripePaymentMethod()->toArray();
+                $returnArr[$key]['default'] = false;
+            }
+        }
+        return response($returnArr);
+    }
+
+    public function userAllInvoices(Request $request)
+    {
+        $data = $request->user()->invoices();
+        return response($data);
     }
 
     public function userCreatePaymentMethodIntent(Request $request)
@@ -212,12 +228,14 @@ class AuthController extends Controller
     public function addMoneyWallet(Request $request)
     {
         try {
-            $user = User::find(5);
-            //$user = $request->user();
+            //$user = User::find(5);
+            $user = $request->user();
 
             //$customer = $user->createOrGetStripeCustomer();
             $payment = $user->charge(100, 'pm_1FfgJ7JrUCJ0Ln0ZJG0fkVlW');
-            $user->deposit(100, 'add money', $payment->asStripePaymentIntent()->toJSON());
+            //$payment = $user->invoiceFor('One Time Fee', 500);
+            //dd($payment->asStripeInvoice()->toArray());
+            $user->deposit(500, 'add money', $payment->asStripePaymentIntent()->toJSON());
             return response([
                 'message' => 'Money Added Successfully',
                 'payment' => $payment->asStripePaymentIntent()->toJSON(),

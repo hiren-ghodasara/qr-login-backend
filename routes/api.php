@@ -20,8 +20,8 @@ Route::any('/get-all-contest', 'Api\ContestController@listAllContest')->name('ge
 Route::get('/get-all-filters', 'Api\ContestController@setSideBarFilter')->name('get.all.filters');
 Route::post('/test-create', 'Api\ContestController@TestCreate')->name('get.all.TestCreate');
 
-Route::get('/user-add-money', 'Api\AuthController@addMoneyWallet')->name('user.add.money');
-Route::get('/user-payment-methods', 'Api\AuthController@userAllPaymentMethods')->name('user.payment.list');
+//Route::get('/user-add-money', 'Api\AuthController@addMoneyWallet')->name('user.add.money');
+//Route::get('/user-payment-methods', 'Api\AuthController@userAllPaymentMethods')->name('user.payment.list');
 
 Route::middleware('auth:api')->group(function () {
     Route::get('/user', function (Request $request) {
@@ -37,8 +37,9 @@ Route::middleware('auth:api')->group(function () {
     //transaction
     Route::get('/user-transactions', 'Api\AuthController@userAllTransactions')->name('user.transactions');
     //
-    //Route::get('/user-payment-methods', 'Api\AuthController@userAllPaymentMethods')->name('user.payment.list');
+    Route::get('/user-payment-methods', 'Api\AuthController@userAllPaymentMethods')->name('user.payment.list');
+    Route::get('/user-payment-invoices', 'Api\AuthController@userAllInvoices')->name('user.invoices.list');
     Route::get('/user-payment-intent', 'Api\AuthController@userCreatePaymentMethodIntent')->name('user.payment.intent');
-    //Route::get('/user-add-money', 'Api\AuthController@addMoneyWallet')->name('user.add.money');
+    Route::get('/user-add-money', 'Api\AuthController@addMoneyWallet')->name('user.add.money');
     Route::post('/add-payment-method', 'Api\AuthController@addPaymentMethod')->name('user.payment.add');
 });
