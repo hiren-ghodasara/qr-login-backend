@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class CreateContestTypesTable extends Migration
+class CreateTransactionTypeTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateContestTypesTable extends Migration
      */
     public function up()
     {
-        Schema::create('contest_types', function (Blueprint $table) {
+        Schema::create('transactions_type', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
             $table->string('description');
@@ -28,6 +28,6 @@ class CreateContestTypesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('contest_types');
+        Schema::dropIfExists('transactions_type');
     }
 }

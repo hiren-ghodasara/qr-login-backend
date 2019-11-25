@@ -25,6 +25,8 @@ class CreateWalletTransactionsTable extends Migration
         Schema::table('transactions', function (Blueprint $table) {
             $table->unsignedBigInteger('user_id')->index()->after('id');
             $table->foreign('user_id')->references('id')->on('users');
+            $table->unsignedBigInteger('transaction_type')->index()->after('type');
+            $table->foreign('transaction_type')->references('id')->on('transactions_type');
         });
     }
 

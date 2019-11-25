@@ -23,6 +23,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call(AuthTableSeeder::class);
+        $this->call(ContestTypeTableSeeder::class);
+        $this->call(TransactionTypeTableSeeder::class);
 
         Model::reguard();
     }
